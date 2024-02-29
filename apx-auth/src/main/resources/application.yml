@@ -1,0 +1,8 @@
+server:
+  port: 5050
+
+spring:
+  application:
+    name: apx-auth
+  profiles:
+    active: @profiles.active@,mbg

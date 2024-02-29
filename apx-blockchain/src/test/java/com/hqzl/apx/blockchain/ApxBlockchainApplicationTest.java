@@ -1,0 +1,66 @@
+package com.hqzl.apx.blockchain;
+
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hqzl.apx.blockchain.pojo.LeafProof;
+import com.hqzl.apx.blockchain.pojo.MerkelTree;
+import com.hqzl.apx.common.constant.BlockchainConstants;
+import com.hqzl.apx.common.constant.CommonConstants;
+import com.hqzl.apx.common.constant.RedisConstants;
+import com.hqzl.apx.mbg.mapper.UserMapper;
+import com.hqzl.apx.mbg.model.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.*;
+
+@SpringBootTest
+public class ApxBlockchainApplicationTest {
+    @Autowired
+    private UserMapper userMapper;
+    @Test
+    public void test() {
+
+    }
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    @Test
+    public void test1() {
+        Set<String> keys = redisTemplate.keys(RedisConstants.USER_ADDRESS + "*");
+        redisTemplate.delete(keys);
+        redisTemplate.delete(RedisConstants.MERKEL_TREE_ROOT);
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.ne(User::getBalance, "0");
+        List<User> users = userMapper.selectList(lambdaQueryWrapper);
+        if (ObjectUtil.isEmpty(users)) {
+            return;
+        }
+        List<Map<String, String>> list = new ArrayList();
+        for (User user : users) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("address", user.getAddress());
+            map.put("amount", String.format("%.0f", NumberUtil.mul(Double.valueOf(user.getBalance()).doubleValue(), Math.pow(10, 18))));
+            list.add(map);
+        }
+        Map<String, List> param = new HashMap<>();
+        param.put("claimsInfo", list);
+        String resp = HttpUtil.post(CommonConstants.HTTP + BlockchainConstants.ON_CHAIN_SERVER_IP + "/createClaimMerkleTree", JSONUtil.toJsonStr(param));
+
+        MerkelTree merkelTree = JSONUtil.toBean(resp, MerkelTree.class);
+        redisTemplate.opsForValue().set(RedisConstants.MERKEL_TREE_ROOT, merkelTree.getRoot());
+        List<LeafProof> leafProofs = merkelTree.getLeafProof();
+        for (LeafProof leafProof : leafProofs) {
+            redisTemplate.opsForValue().set(RedisConstants.USER_ADDRESS + leafProof.getValue().get(0), leafProof);
+        }
+    }
+
+
+
+}

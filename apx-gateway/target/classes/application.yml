@@ -1,0 +1,56 @@
+server:
+  port: 43333
+  ssl:
+    protocol: TLS
+    key-store: classpath:ssl/www.apexpal.io.pfx
+    key-store-password: bwse07bp
+    enabled: true
+
+spring:
+  application:
+    name: apx-gateway
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations: # 跨域配置
+          '[/**]': # 匹配所有路径
+            allowedOriginPatterns: "*" # 允许的域名
+            allowedHeaders: "*" # 允许的请求头
+            allowedMethods: "*" # 允许的方法
+            allowCredentials: true # 是否携带cookie
+            maxAge: 3600
+      # 将注册中心大写的服务名称转为小写
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # 路由唯一标识
+        - id: game
+          # 路由指向目的地URL或服务名，客户端请求最终被转发到的微服务
+          uri: lb://apx-game
+          # 断言：如果匹配断言规则为true，则转发请求
+          predicates:
+          # 以apx-game开头的请求都负载到apx-game服务
+            - Path=/apx-game/**
+          # 过滤器：请求成功后做某一些动作
+          filters:
+          # 过滤掉url里的apx-api,例如http://ip:port/apx-api/test -> http://ip:port/test
+            - RewritePath=/apx-game/(?<segment>.*), /$\{segment}
+
+#         认证中心
+        - id: auth
+          uri: lb://apx-auth
+          predicates:
+            - Path=/apx-auth/**
+          filters:
+            - RewritePath=/apx-auth/(?<segment>.*), /$\{segment}
+
+        - id: blockchain
+          uri: lb://apx-blockchain
+          predicates:
+            - Path=/apx-blockchain/**
+          filters:
+            - RewritePath=/apx-blockchain/(?<segment>.*), /$\{segment}

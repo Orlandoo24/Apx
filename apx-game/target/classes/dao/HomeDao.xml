@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hqzl.apx.game.dao.HomeDao">
+
+    <select id="selectMyProp" resultType="com.hqzl.apx.game.pojo.MyProp">
+        SELECT
+        t2.user_pet_id,
+        t2.id user_prop_id,
+        t1.`name`,
+        t1.img_url,
+        t1.type,
+        t1.iq_value_bonus,
+        t1.luck_value_bonus,
+        t1.satiety_value_bonus,
+        t1.iq_value_add,
+        t1.balance_add,
+        t1.luck_value_add,
+        t1.satiety_max_add,
+        t1.satiety_speed_add
+        FROM
+        apx_prop t1
+        JOIN apx_user_prop t2 ON t1.id = t2.prop_id
+        WHERE
+        t2.user_id = #{userId}
+        <if test="type != null and type != ''">
+            AND t1.type = #{type}
+        </if>
+    </select>
+
+
+    <resultMap id="MyPetWithPropResultMap" type="com.hqzl.apx.game.pojo.MyPetInfoResp">
+        <id column="user_pet_id" property="userPetId"/>
+        <result column="pet_name" property="petName"/>
+        <result column="pet_img_url" property="petImgUrl"/>
+        <result column="satiety_max" property="satietyMax"/>
+        <result column="iq_level" property="iqLevel"/>
+        <result column="iq_value" property="iqValue"/>
+        <result column="satiety_value" property="satietyValue"/>
+        <result column="luck_value" property="luckValue"/>
+        <result column="active" property="active"/>
+        <collection property="myProps" ofType="com.hqzl.apx.game.pojo.MyProp" resultMap="myPropDtoResultMap"/>
+    </resultMap>
+    <resultMap id="myPropDtoResultMap" type="com.hqzl.apx.game.pojo.MyProp">
+        <id column="user_prop_id" property="userPropId"/>
+        <result column="prop_name" property="name"/>
+        <result column="prop_img_url" property="propImgUrl"/>
+        <result column="type" property="type"/>
+        <result column="iq_value_bonus" property="iqValueBonus"/>
+        <result column="luck_value_bonus" property="luckValueBonus"/>
+        <result column="satiety_value_bonus" property="satietyValueBonus"/>
+        <result column="iq_value_add" property="iqValueAdd"/>
+        <result column="balance_add" property="balanceAdd"/>
+        <result column="luck_value_add" property="luckValueAdd"/>
+        <result column="satiety_max_add" property="satietyMaxAdd"/>
+        <result column="satiety_speed_add" property="satietySpeedAdd"/>
+    </resultMap>
+    
+
+    <select id="selectMyPetInfo" resultMap="MyPetWithPropResultMap">
+        SELECT t2.id     user_pet_id,
+               t1.`name` pet_name,
+               t1.img_url pet_img_url,
+               t1.satiety_max,
+               t2.iq_level,
+               t2.iq_value,
+               t2.satiety_value,
+               t2.luck_value,
+               t2.active,
+               t3.id     user_prop_id,
+               t4.`name` prop_name,
+               t4.img_url prop_img_url,
+               t4.type,
+               t4.iq_value_bonus,
+               t4.luck_value_bonus,
+               t4.satiety_value_bonus,
+               t4.iq_value_add,
+               t4.balance_add,
+               t4.luck_value_add,
+               t4.satiety_max_add,
+               t4.satiety_speed_add
+        FROM apx_pet t1
+                 JOIN apx_user_pet t2 ON t1.id = t2.pet_id
+                 LEFT JOIN apx_user_prop t3 ON t2.id = t3.user_pet_id
+                 LEFT JOIN apx_prop t4 ON t4.id = t3.prop_id
+        WHERE t2.user_id = #{userId}
+    </select>
+</mapper>

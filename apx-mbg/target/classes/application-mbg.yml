@@ -1,0 +1,15 @@
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    # 开启 mybatis-plus 日志打印功能，生产环境不要配置日志打印功能
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 全局默认主键类型，设置后，可省略实体对象中的@TableId(type = IdType.AUTO)配置
+    global-config:
+      db-config:
+        id-type: auto
+        # 省略表名前缀，全局配置后可省略@TableName()配置，但实体类名必须和表后缀名一致
+        table-prefix: apx_
+        # 配置mybatis 逻辑删除
+        logic-delete-field: del #默认deleted
+        logic-delete-value: 1
+        logic-not-delete-value: 0

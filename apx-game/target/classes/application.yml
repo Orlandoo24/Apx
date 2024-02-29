@@ -1,0 +1,12 @@
+server:
+  port: 7070
+
+mybatis-plus:
+  mapper-locations: classpath*:dao/*.xml
+
+
+spring:
+  application:
+    name: apx-game
+  profiles:
+    active: dev,mbg
