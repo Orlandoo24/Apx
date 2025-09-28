@@ -1,8 +1,17 @@
 # APX 区块链游戏平台
 
+## APX 简介
+
+ApeXpal 是一个基於Blast並结合SocialFi、NFT、铭文的宠物养成游戏，ApeXpal侧重的理念是將傳統遊戲与社区玩家通过大量交互共同发展并探索新玩法，尤其注重玩家的游戏体验、社区氛围、与是否能够长久经营的游戏机制，我们将虚拟宠物拥有的养成乐趣与变革能力结合在一起。为用户提供了一个充满活力、引人入胜的环境来提升、照顾、交易他们的虚拟宠物。在虚拟世界拥有虚拟宠物的体验更加愉快，同时在您饲养宠物时为您创造更多利润！
+
 ## 项目简介
 
 APX 是一个基于 Spring Cloud 微服务架构的区块链游戏平台，集成了宠物养成、挖矿、交易等游戏功能，并支持区块链资产管理和第三方认证登录。
+白皮书： https://apexpal.gitbook.io/apexpal-whitepaper
+
+
+<img width="1280" height="624" alt="image" src="https://github.com/user-attachments/assets/49eaf54b-ad1e-4533-b71c-abf317541871" />
+
 
 ## 技术栈
 
